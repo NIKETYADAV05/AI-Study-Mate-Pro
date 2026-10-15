@@ -1,0 +1,24 @@
+.shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.main {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  min-width: 0;
+  padding: 32px;
+  /* Subtle dot-grid texture on the page background */
+  background:
+    radial-gradient(circle, rgba(79,70,229,0.04) 1px, transparent 1px),
+    var(--bg);
+  background-size: 24px 24px, 100%;
+}
+
+@media (max-width: 768px) {
+  .main {
+    margin-left: 0;
+    padding: 80px 16px 24px;
+    background: var(--bg);
+  }
+}

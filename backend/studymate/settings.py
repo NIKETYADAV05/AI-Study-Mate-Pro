@@ -40,9 +40,21 @@ if _env_path.exists():
 SECRET_KEY = 'django-insecure-!986krw_8uyw-te*m3_*hakhg#k)!ac!o#2s*_%==m#eiyheb='
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.environ.get("DJANGO_DEBUG", "false").strip().lower() in {
+    "1",
+    "true",
+    "yes",
+}
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+render_hostname = os.environ.get("RENDER_EXTERNAL_HOSTNAME")
+if render_hostname:
+    ALLOWED_HOSTS.append(render_hostname)
+ALLOWED_HOSTS.extend(
+    host.strip()
+    for host in os.environ.get("DJANGO_ALLOWED_HOSTS", "").split(",")
+    if host.strip()
+)
 
 
 # Application definition

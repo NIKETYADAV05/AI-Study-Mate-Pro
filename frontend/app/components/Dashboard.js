@@ -141,6 +141,30 @@ export default function Dashboard() {
   const [claimingKey,   setClaimingKey]   = useState(null);   // key being claimed
   const [claimResults,  setClaimResults]  = useState({});     // { key: { xp, error } }
 
+  const loadDashboard = useCallback((signal) => {
+    fetch("/api/progress", { signal })
+      .then((res) => {
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+        return res.json();
+      })
+      .then((json) => {
+        if (!signal?.aborted) {
+          setData(json);
+          setLoading(false);
+        }
+      })
+      .catch((e) => {
+        if (signal?.aborted || e.name === "AbortError") return;
+        const msg = e.message ?? "";
+        setError(
+          msg.includes("fetch") || msg.includes("Failed") || msg.includes("NetworkError")
+            ? "Cannot reach the backend. Make sure Django is running on port 8000."
+            : `Could not load dashboard data: ${msg}`
+        );
+        setLoading(false);
+      });
+  }, []);
+
   const loadQuests = useCallback(async () => {
     try {
       const res = await fetch("/api/quests");
@@ -153,29 +177,8 @@ export default function Dashboard() {
 
   useEffect(() => {
     let ignore = false;
-
-    fetch("/api/progress")
-      .then((res) => {
-        if (!res.ok) throw new Error(`Server error ${res.status}`);
-        return res.json();
-      })
-      .then((json) => {
-        if (!ignore) {
-          setData(json);
-          setLoading(false);
-        }
-      })
-      .catch((e) => {
-        if (!ignore) {
-          const msg = e.message ?? "";
-          setError(
-            msg.includes("fetch") || msg.includes("Failed") || msg.includes("NetworkError")
-              ? "Cannot reach the backend. Make sure Django is running on port 8000."
-              : `Could not load dashboard data: ${msg}`
-          );
-          setLoading(false);
-        }
-      });
+    const controller = new AbortController();
+    loadDashboard(controller.signal);
 
     fetch("/api/quests")
       .then((res) => {
@@ -191,8 +194,9 @@ export default function Dashboard() {
 
     return () => {
       ignore = true;
+      controller.abort();
     };
-  }, []);
+  }, [loadDashboard]);
 
   // ── Claim a quest ────────────────────────────────────────────────────────
   async function handleClaim(quest) {
@@ -275,7 +279,11 @@ export default function Dashboard() {
           <span>⚠️</span>
           <span>{error || "No data available."}</span>
           <button
-            onClick={load}
+            onClick={() => {
+              setLoading(true);
+              setError("");
+              loadDashboard();
+            }}
             style={{
               marginLeft: "auto", background: "none", border: "1px solid #fecaca",
               borderRadius: "var(--radius-sm)", padding: "4px 12px", cursor: "pointer",

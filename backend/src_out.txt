@@ -1,0 +1,32 @@
+﻿from django.db import models
+
+
+class Note(models.Model):
+    """A single saved study note."""
+
+    SUBJECT_CHOICES = [
+        ("Computer Networks",  "Computer Networks"),
+        ("Operating Systems",  "Operating Systems"),
+        ("DBMS",               "DBMS"),
+        ("Java",               "Java"),
+        ("Web Development",    "Web Development"),
+        ("Mathematics",        "Mathematics"),
+        ("Physics",            "Physics"),
+        ("Chemistry",          "Chemistry"),
+        ("Biology",            "Biology"),
+        ("History",            "History"),
+        ("Other",              "Other"),
+    ]
+
+    title   = models.CharField(max_length=200)
+    subject = models.CharField(max_length=50, choices=SUBJECT_CHOICES, default="Other")
+    content = models.TextField()
+    created = models.DateTimeField(auto_now_add=True)
+    updated = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ["-updated"]
+
+    def __str__(self):
+        return f"{self.title} ({self.subject})"
+

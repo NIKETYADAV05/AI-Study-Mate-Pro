@@ -1,0 +1,22 @@
+{
+  "verdict": "APPROVED",
+  "findings": [
+    {
+      "id": 1,
+      "label": "Finding 3 test does not independently exercise _build_mcq inner gate",
+      "severity": "non-blocking",
+      "confidence": "possible",
+      "description": "test_build_mcq_inner_similarity_gate_rejects_near_duplicate calls _assemble_quiz rather than _build_mcq directly. The pool-level gate in _build_distractor_pool fires first; if it catches every near-duplicate, the inner gate in _build_mcq is never exercised and could be deleted without this test failing.",
+      "fix": "Call _build_mcq directly in the test, constructing a distractor pool that already contains a near-duplicate so the pool-level gate has been bypassed. This independently verifies the inner gate."
+    },
+    {
+      "id": 2,
+      "label": "Hard-difficulty test assertions may be vacuously satisfied",
+      "severity": "non-blocking",
+      "confidence": "possible",
+      "description": "test_hard_difficulty_produces_valid_questions permits zero questions from the DBMS source. The overlap < 0.05 filter may be strict enough that the 13-sentence DBMS corpus never produces any hard-difficulty MCQs, making the loop body a no-op every run and the hard-overlap path effectively untested.",
+      "fix": "Run the hard-difficulty assertion against the longer OS source (_LONG_SOURCE) where more sentence pairs are likely to pass the overlap filter, ensuring the structural assertions actually execute."
+    }
+  ],
+  "reviewDoc": "c:\\Users\\Niket\\OneDrive\\Desktop\\AI StudyMate Pro\\backend\\.agents\\tasks\\2026-10-15-143000-review.md"
+}

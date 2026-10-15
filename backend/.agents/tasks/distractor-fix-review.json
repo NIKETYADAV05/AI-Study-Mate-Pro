@@ -1,0 +1,20 @@
+{
+  "verdict": "APPROVED",
+  "findings": [
+    {
+      "id": 1,
+      "label": "Notorious-phrase tests always skip on _DBMS_REUSE_SOURCE",
+      "severity": "LOW",
+      "description": "test_notorious_phrase_not_distractor_for_database_instance and test_notorious_phrase_not_distractor_for_dba have never asserted anything in any recorded run — both skipped in the reported output. The source contains the relevant sentences but the top-5 scorer doesn't consistently pick them. The tests are structurally honest (skipTest > silent pass) but provide zero runtime coverage of the notorious-phrase guard.",
+      "recommendation": "Rewrite both tests to call _build_mcq directly on the known target sentence rather than relying on _assemble_quiz scoring to select it. This makes them deterministic and reliably asserting."
+    },
+    {
+      "id": 2,
+      "label": "test_cross_question_reuse_bounded allows ≤2 reuses, not ≤1",
+      "severity": "LOW",
+      "description": "The conservative ≤2 bound is correct given pool-size arithmetic (9 candidates, 15 draws) and is documented in the test comment. No production bug — the bound cannot be tightened without expanding _DBMS_REUSE_SOURCE.",
+      "recommendation": "Expand _DBMS_REUSE_SOURCE to 20+ sentences in a follow-up and tighten the bound to assertLessEqual(count, 1) once the candidate pool exceeds 15."
+    }
+  ],
+  "reviewDoc": "c:\\Users\\Niket\\OneDrive\\Desktop\\AI StudyMate Pro\\backend\\.agents\\tasks\\distractor-fix-review.md"
+}

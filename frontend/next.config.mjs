@@ -13,8 +13,7 @@ const nextConfig = {
       // because Django's URL dispatcher requires it.
       {
         source: "/api/:path*",
-        destination: "http://127.0.0.1:8000/api/:path*/",
-      },
+        destination: "https://ai-study-mate-pro.onrender.com/api/:path*/",      },
     ];
   },
 };
